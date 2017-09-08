@@ -5,7 +5,7 @@ import (
 
 	"fmt"
 
-	"github.com/Nivl/go-rest-tools/types/slices"
+	"github.com/Nivl/go-types/slices"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -35,4 +35,10 @@ func TestInSliceWithString(t *testing.T) {
 			})
 		}
 	})
+}
+
+func TestInSliceWithNoSlice(t *testing.T) {
+	found, err := slices.InSlice("no-a-slice", "")
+	assert.Error(t, err, "InSlice() shoud have failed")
+	assert.False(t, found, "nothing should have been found")
 }
