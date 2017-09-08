@@ -3,7 +3,7 @@ package strngs_test
 import (
 	"testing"
 
-	"github.com/Nivl/go-rest-tools/types/strngs"
+	"github.com/Nivl/go-types/strngs"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -20,6 +20,8 @@ func TestIsValidURL(t *testing.T) {
 		{"file should fail", "file:///dev/urandom", shouldFail},
 		{"http should work", "http://google.com", !shouldFail},
 		{"https should work", "https://google.com", !shouldFail},
+		{"uri should fail", "/dev/random", shouldFail},
+		{"not a url should fail", "not a url", shouldFail},
 	}
 
 	for _, tc := range testCases {
@@ -54,6 +56,28 @@ func TestIsValidEmail(t *testing.T) {
 		t.Run(tc.description, func(t *testing.T) {
 			t.Parallel()
 			assert.Equal(t, !tc.shouldFail, strngs.IsValidEmail(tc.email))
+		})
+	}
+}
+
+func TestIsValidUUID(t *testing.T) {
+	// sugar
+	shouldFail := true
+
+	testCases := []struct {
+		description string
+		input       string
+		shouldFail  bool
+	}{
+		{"valid uuid", "676a5135-897e-40fc-b37a-95b6b0bcf09e", !shouldFail},
+		{"invalid uuid", "not a uuid", shouldFail},
+	}
+
+	for _, tc := range testCases {
+		tc := tc
+		t.Run(tc.description, func(t *testing.T) {
+			t.Parallel()
+			assert.Equal(t, !tc.shouldFail, strngs.IsValidUUID(tc.input))
 		})
 	}
 }
