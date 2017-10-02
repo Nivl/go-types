@@ -13,10 +13,7 @@ import (
 )
 
 func TestValue(t *testing.T) {
-	loc, err := time.LoadLocation("America/Los_Angeles")
-	require.NoError(t, err, "timezone not found")
-
-	tm := time.Date(2017, time.September, 7, 23, 18, 42, 0, loc)
+	tm := time.Date(2017, time.September, 7, 23, 18, 42, 0, time.UTC)
 	dt := &datetime.DateTime{Time: tm}
 
 	v, err := dt.Value()
@@ -33,22 +30,16 @@ func TestValueNil(t *testing.T) {
 }
 
 func TestScan(t *testing.T) {
-	loc, err := time.LoadLocation("America/Los_Angeles")
-	require.NoError(t, err, "timezone not found")
-
-	tm := time.Date(2017, time.September, 7, 23, 18, 42, 0, loc)
+	tm := time.Date(2017, time.September, 7, 23, 18, 42, 0, time.UTC)
 
 	dt := &datetime.DateTime{}
-	err = dt.Scan(tm)
+	err := dt.Scan(tm)
 	require.NoError(t, err, "dt.Scan() should not have fail")
 	assert.Equal(t, tm.String(), dt.String(), "dt.Value() should not have fail")
 }
 
 func TestEqual(t *testing.T) {
-	loc, err := time.LoadLocation("America/Los_Angeles")
-	require.NoError(t, err, "timezone not found")
-
-	tm := time.Date(2017, time.September, 7, 23, 18, 42, 0, loc)
+	tm := time.Date(2017, time.September, 7, 23, 18, 42, 0, time.UTC)
 	dt := &datetime.DateTime{Time: tm}
 
 	isEqual := dt.Equal(&datetime.DateTime{Time: tm})
@@ -59,10 +50,7 @@ func TestEqual(t *testing.T) {
 }
 
 func TestAddDate(t *testing.T) {
-	loc, err := time.LoadLocation("America/Los_Angeles")
-	require.NoError(t, err, "timezone not found")
-
-	tm := time.Date(2017, time.September, 7, 23, 18, 42, 0, loc)
+	tm := time.Date(2017, time.September, 7, 23, 18, 42, 0, time.UTC)
 	dt := &datetime.DateTime{Time: tm}
 
 	newDate := dt.AddDate(1, -2, 7)
@@ -76,19 +64,24 @@ func TestAddDate(t *testing.T) {
 
 func TestUnmarshalJSON(t *testing.T) {
 	t.Run("raw function", func(t *testing.T) {
+		t.Parallel()
+
 		dt := &datetime.DateTime{}
 		err := dt.UnmarshalJSON([]byte(`"2017-09-07T23:18:42-0700"`))
 		assert.NoError(t, err, "UnmarshalJSON() should have work")
 
+		// the result should be in UTC
 		assert.Equal(t, 2017, dt.Year())
 		assert.Equal(t, time.September, dt.Month())
-		assert.Equal(t, 7, dt.Day())
-		assert.Equal(t, 23, dt.Hour())
+		assert.Equal(t, 8, dt.Day())
+		assert.Equal(t, 6, dt.Hour())
 		assert.Equal(t, 18, dt.Minute())
 		assert.Equal(t, 42, dt.Second())
 	})
 
 	t.Run("json.Decode", func(t *testing.T) {
+		t.Parallel()
+
 		body := strings.NewReader(`{"date":"2017-09-07T23:18:42-0700"}`)
 		var pld struct {
 			Datetime *datetime.DateTime `json:"date"`
@@ -99,20 +92,26 @@ func TestUnmarshalJSON(t *testing.T) {
 		if assert.NotNil(t, pld, "pld should not be nil") {
 			assert.Equal(t, 2017, pld.Datetime.Year())
 			assert.Equal(t, time.September, pld.Datetime.Month())
-			assert.Equal(t, 7, pld.Datetime.Day())
-			assert.Equal(t, 23, pld.Datetime.Hour())
+			assert.Equal(t, 8, pld.Datetime.Day())
+			assert.Equal(t, 6, pld.Datetime.Hour())
 			assert.Equal(t, 18, pld.Datetime.Minute())
 			assert.Equal(t, 42, pld.Datetime.Second())
 		}
 	})
+
+	t.Run("raw function with bad data", func(t *testing.T) {
+		t.Parallel()
+
+		dt := &datetime.DateTime{}
+		err := dt.UnmarshalJSON([]byte(`"2017-09-07T23:18:42-invalid"`))
+		assert.Error(t, err, "UnmarshalJSON() should have failed")
+	})
 }
 
 func TestMarshalJSON(t *testing.T) {
-	loc, err := time.LoadLocation("America/Los_Angeles")
-	require.NoError(t, err, "timezone not found")
-	tm := time.Date(2017, time.September, 7, 23, 18, 42, 0, loc)
+	tm := time.Date(2017, time.September, 7, 23, 18, 42, 0, time.UTC)
 	dt := &datetime.DateTime{Time: tm}
-	expectedOutput := `"2017-09-07T23:18:42-0700"`
+	expectedOutput := `"2017-09-07T23:18:42+0000"`
 
 	t.Run("raw function", func(t *testing.T) {
 		data, err := dt.MarshalJSON()

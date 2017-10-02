@@ -15,7 +15,7 @@ import (
 
 func TestToday(t *testing.T) {
 	today := date.Today()
-	year, month, day := time.Now().Date()
+	year, month, day := time.Now().UTC().Date()
 
 	assert.Equal(t, year, today.Year(), "Un expected year")
 	assert.Equal(t, month, today.Month(), "Un expected month")
@@ -81,6 +81,8 @@ func TestNew(t *testing.T) {
 
 func TestValue(t *testing.T) {
 	t.Run("valid date should work", func(t *testing.T) {
+		t.Parallel()
+
 		d, err := date.New("2017-09-09")
 		require.NoError(t, err, "New() should have work")
 
@@ -90,6 +92,8 @@ func TestValue(t *testing.T) {
 	})
 
 	t.Run("nil date should work", func(t *testing.T) {
+		t.Parallel()
+
 		var d *date.Date
 		v, err := d.Value()
 		require.NoError(t, err, "d.Value() should not have fail")
