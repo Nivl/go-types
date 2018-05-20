@@ -81,3 +81,32 @@ func TestIsValidUUID(t *testing.T) {
 		})
 	}
 }
+
+func TestIsValidSlug(t *testing.T) {
+	// sugar
+	shouldFail := true
+
+	testCases := []struct {
+		description string
+		input       string
+		shouldFail  bool
+	}{
+		{"uuid should pass", "676a5135-897e-40fc-b37a-95b6b0bcf09e", !shouldFail},
+		{"uppercase should fail", "ABCD", shouldFail},
+		{"spaces should fail", "a b c d", shouldFail},
+		{"underscore at the begining should fail", "-abcd", shouldFail},
+		{"dash at the end should fail", "abcd-", shouldFail},
+		{"# should fail", "ab#cd", shouldFail},
+		{"? should fail", "ab?cd", shouldFail},
+		{"/ should fail", "a/b/cd", shouldFail},
+		{"\\ should fail", "a\\b\\cd", shouldFail},
+	}
+
+	for _, tc := range testCases {
+		tc := tc
+		t.Run(tc.description, func(t *testing.T) {
+			t.Parallel()
+			assert.Equal(t, !tc.shouldFail, strngs.IsValidSlug(tc.input))
+		})
+	}
+}
