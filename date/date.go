@@ -1,3 +1,4 @@
+// Package date contains methods and structs to deal with timeless date
 package date
 
 import (
