@@ -4,7 +4,7 @@ package octets
 
 // List of all different supported type
 const (
-	Byte = 1.0 << (10 * iota)
+	Byte int64 = 1.0 << (10 * iota)
 	KiloByte
 	MegaByte
 	GigaByte
@@ -12,27 +12,27 @@ const (
 	PetaByte
 	ExaByte
 
-	B  = Byte
-	KB = KiloByte
-	MB = MegaByte
-	GB = GigaByte
-	TB = TeraByte
-	PB = PetaByte
-	EB = ExaByte
+	B  int64 = Byte
+	KB int64 = KiloByte
+	MB int64 = MegaByte
+	GB int64 = GigaByte
+	TB int64 = TeraByte
+	PB int64 = PetaByte
+	EB int64 = ExaByte
 
-	Octet     = Byte
-	KiloOctet = KiloByte
-	MegaOctet = MegaByte
-	GigaOctet = GigaByte
-	TeraOctet = GigaByte
-	PetaOctet = PetaByte
-	ExaOctet  = ExaByte
+	Octet     int64 = Byte
+	KiloOctet int64 = KiloByte
+	MegaOctet int64 = MegaByte
+	GigaOctet int64 = GigaByte
+	TeraOctet int64 = GigaByte
+	PetaOctet int64 = PetaByte
+	ExaOctet  int64 = ExaByte
 
-	O  = Octet
-	Ko = KiloOctet
-	Mo = MegaOctet
-	Go = GigaOctet
-	To = TeraOctet
-	Po = PetaOctet
-	Eo = ExaOctet
+	O  int64 = Octet
+	Ko int64 = KiloOctet
+	Mo int64 = MegaOctet
+	Go int64 = GigaOctet
+	To int64 = TeraOctet
+	Po int64 = PetaOctet
+	Eo int64 = ExaOctet
 )
