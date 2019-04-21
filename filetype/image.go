@@ -9,16 +9,16 @@ import (
 	"io"
 )
 
-// ErrMsgUnsuportedImageFormat represents the error message returned for an
+// ErrMsgUnsupportedImageFormat represents the error message returned for an
 // unsupported image type
-var ErrMsgUnsuportedImageFormat = "unsuported image format"
+var ErrMsgUnsupportedImageFormat = "unsupported image format"
 
 // ImageDecoder is a type that represents an image decoder
 type ImageDecoder func(r io.Reader) (image.Image, error)
 
 // IsImage checks the specified reader contains an image
-func IsImage(r io.ReadSeeker) (bool, string, error) {
-	mimeType, err := MimeType(r)
+func IsImage(r io.ReadSeeker) (isValid bool, mimeType string, err error) {
+	mimeType, err = MimeType(r)
 	if err != nil {
 		return false, "", err
 	}
@@ -30,9 +30,9 @@ func IsImage(r io.ReadSeeker) (bool, string, error) {
 	}
 	validator, found := validType[mimeType]
 	if !found {
-		return false, "", errors.New(ErrMsgUnsuportedImageFormat)
+		return false, "", errors.New(ErrMsgUnsupportedImageFormat)
 	}
-	isValid, err := validator(r)
+	isValid, err = validator(r)
 	return isValid, mimeType, err
 }
 

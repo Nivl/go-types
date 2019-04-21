@@ -31,13 +31,20 @@ func MimeType(r io.ReadSeeker) (string, error) {
 }
 
 // SHA256Sum returns the SHA256 sum of a reader
-func SHA256Sum(r io.ReadSeeker) (string, error) {
-	initialPos, err := r.Seek(0, io.SeekCurrent)
+func SHA256Sum(r io.ReadSeeker) (hash string, err error) {
+	var initialPos int64
+
+	initialPos, err = r.Seek(0, io.SeekCurrent)
 	if err != nil {
 		return "", err
 	}
 	// revert the pointer back to its original position
-	defer r.Seek(initialPos, io.SeekStart)
+	defer func() {
+		_, seekErr := r.Seek(initialPos, io.SeekStart)
+		if err == nil {
+			err = seekErr
+		}
+	}()
 
 	// copy the file to read it's content
 	h := sha256.New()
@@ -46,6 +53,6 @@ func SHA256Sum(r io.ReadSeeker) (string, error) {
 	}
 
 	// cast the hash and return it
-	hash := fmt.Sprintf("%x", h.Sum(nil))
+	hash = fmt.Sprintf("%x", h.Sum(nil))
 	return hash, nil
 }

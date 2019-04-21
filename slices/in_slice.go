@@ -7,7 +7,7 @@ import (
 
 // InSlice looks for a value in a slice, returns true if the value is present,
 // false otherwise
-func InSlice(slice interface{}, val interface{}) (bool, error) {
+func InSlice(slice, val interface{}) (bool, error) {
 	switch reflect.TypeOf(slice).Kind() {
 	case reflect.Slice:
 		s := reflect.ValueOf(slice)
