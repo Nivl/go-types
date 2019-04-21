@@ -14,6 +14,7 @@ import (
 	"github.com/Nivl/go-types/filetype"
 	gomock "github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func TestSHA256Sum(t *testing.T) {
@@ -82,11 +83,10 @@ func TestMimeType(t *testing.T) {
 
 			filePath := path.Join("fixtures", tc.filename)
 			f, err := os.Open(filePath)
-			if err != nil {
-				t.Fatal(err)
-			}
-			defer f.Close()
-
+			require.NoError(t, err, "os.Open() should have succeed")
+			defer func() {
+				assert.NoError(t, f.Close(), "Close() should have worked")
+			}()
 			mime, err := filetype.MimeType(f)
 			assert.NoError(t, err, "MimeType() should have succeed")
 			assert.Equal(t, tc.expected, mime, "invalid mimetype")
