@@ -30,7 +30,7 @@ func Today() *Date {
 }
 
 // New accepts "year-month" or "year-month-day"
-func New(date string) (*Date, error) {
+func New(date string) (Date, error) {
 	// If we only have year-month, then we add "-day"
 	if strings.Count(date, "-") == 1 {
 		date += "-01"
@@ -38,9 +38,9 @@ func New(date string) (*Date, error) {
 
 	t, err := time.Parse(DATE, date)
 	if err != nil {
-		return nil, err
+		return Date{}, err
 	}
-	return &Date{Time: t}, nil
+	return Date{Time: t}, nil
 }
 
 // Value returns a value that the database can handle
@@ -91,19 +91,23 @@ func (t Date) MarshalJSON() ([]byte, error) {
 // UnmarshalJSON tries to parse a json data into a valid struct
 // https://golang.org/pkg/encoding/json/#Unmarshaler
 func (t *Date) UnmarshalJSON(data []byte) (err error) {
+	if string(data) == "null" {
+		return nil
+	}
+
 	t.Time, err = time.Parse(`"`+DATE+`"`, string(data))
 	return
 }
 
 // Equal checks if the given date is equal to the current one
-func (t *Date) Equal(u *Date) bool {
+func (t Date) Equal(u Date) bool {
 	return (t.Time.Year() == u.Time.Year()) &&
 		(t.Time.Month() == u.Time.Month()) &&
 		(t.Time.Day() == u.Time.Day())
 }
 
 // IsBefore checks if the current date is before the given one
-func (t *Date) IsBefore(u *Date) bool {
+func (t Date) IsBefore(u Date) bool {
 	if t.Time.Year() != u.Time.Year() {
 		return t.Time.Year() < u.Time.Year()
 	}
@@ -117,7 +121,7 @@ func (t *Date) IsBefore(u *Date) bool {
 }
 
 // IsAfter checks if the current date is after the given one
-func (t *Date) IsAfter(u *Date) bool {
+func (t Date) IsAfter(u Date) bool {
 	if t.Time.Year() != u.Time.Year() {
 		return t.Time.Year() > u.Time.Year()
 	}

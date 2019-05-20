@@ -68,7 +68,7 @@ func TestNew(t *testing.T) {
 
 			if tc.shouldFail {
 				assert.Error(t, err, "New() should have fail")
-				assert.Nil(t, d, "d should be nil")
+				assert.True(t, d.IsZero(), "d should be zero value")
 			} else {
 				assert.NoError(t, err, "New() should have work")
 				assert.Equal(t, tc.expectedYear, d.Year(), "invalid year")
@@ -105,7 +105,7 @@ func TestScan(t *testing.T) {
 	expectedDate, err := date.New("2017-09-09")
 	require.NoError(t, err, "New() should have work")
 
-	d := &date.Date{}
+	d := date.Date{}
 	err = d.Scan(expectedDate.Time)
 	require.NoError(t, err, "dt.Scan() should not have fail")
 	assert.Equal(t, expectedDate.String(), d.String(), "dt.Value() should not have fail")
@@ -321,7 +321,7 @@ func TestMarshalJSON(t *testing.T) {
 
 	t.Run("json.Marshal", func(t *testing.T) {
 		testStruct := struct {
-			Date *date.Date `json:"date"`
+			Date date.Date `json:"date"`
 		}{Date: dt}
 		expected := fmt.Sprintf(`{"date":"%s"}`, rawDate)
 
@@ -333,7 +333,7 @@ func TestMarshalJSON(t *testing.T) {
 
 func TestUnmarshalJSON(t *testing.T) {
 	t.Run("raw function", func(t *testing.T) {
-		d := &date.Date{}
+		d := date.Date{}
 		err := d.UnmarshalJSON([]byte(`"2017-09-09"`))
 		assert.NoError(t, err, "UnmarshalJSON() should have work")
 
@@ -361,5 +361,13 @@ func TestUnmarshalJSON(t *testing.T) {
 			assert.Equal(t, 0, pld.Date.Minute())
 			assert.Equal(t, 0, pld.Date.Second())
 		}
+	})
+
+	t.Run("null", func(t *testing.T) {
+		d := date.Date{}
+		err := d.UnmarshalJSON([]byte(`null`))
+		assert.NoError(t, err, "UnmarshalJSON() should have work")
+
+		assert.True(t, d.IsZero())
 	})
 }
