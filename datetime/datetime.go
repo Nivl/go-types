@@ -16,8 +16,8 @@ type DateTime struct {
 }
 
 // Now returns the current UTC time.
-func Now() *DateTime {
-	return &DateTime{Time: time.Now().UTC()}
+func Now() DateTime {
+	return DateTime{Time: time.Now().UTC()}
 }
 
 // Value returns a value that the database can handle
@@ -48,6 +48,10 @@ func (t DateTime) MarshalJSON() ([]byte, error) {
 // UnmarshalJSON tries to parse a json data into a valid struct
 // https://golang.org/pkg/encoding/json/#Unmarshaler
 func (t *DateTime) UnmarshalJSON(data []byte) error {
+	if string(data) == "null" {
+		return nil
+	}
+
 	var err error
 	t.Time, err = time.Parse(`"`+ISO8601+`"`, string(data))
 	if err != nil {
@@ -58,11 +62,11 @@ func (t *DateTime) UnmarshalJSON(data []byte) error {
 }
 
 // Equal check if the given date is equal to the current one
-func (t *DateTime) Equal(u *DateTime) bool {
+func (t DateTime) Equal(u DateTime) bool {
 	return t.Time.Equal(u.Time)
 }
 
 // AddDate returns the time corresponding to adding the given number of years, months, and days to t.
-func (t *DateTime) AddDate(years, months, days int) *DateTime {
-	return &DateTime{Time: t.Time.AddDate(years, months, days)}
+func (t DateTime) AddDate(years, months, days int) DateTime {
+	return DateTime{Time: t.Time.AddDate(years, months, days)}
 }

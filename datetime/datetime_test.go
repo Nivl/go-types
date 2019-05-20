@@ -40,9 +40,9 @@ func TestScan(t *testing.T) {
 
 func TestEqual(t *testing.T) {
 	tm := time.Date(2017, time.September, 7, 23, 18, 42, 0, time.UTC)
-	dt := &datetime.DateTime{Time: tm}
+	dt := datetime.DateTime{Time: tm}
 
-	isEqual := dt.Equal(&datetime.DateTime{Time: tm})
+	isEqual := dt.Equal(datetime.DateTime{Time: tm})
 	assert.True(t, isEqual, "Equal should have returned true")
 
 	isEqual = dt.Equal(datetime.Now())
@@ -51,7 +51,7 @@ func TestEqual(t *testing.T) {
 
 func TestAddDate(t *testing.T) {
 	tm := time.Date(2017, time.September, 7, 23, 18, 42, 0, time.UTC)
-	dt := &datetime.DateTime{Time: tm}
+	dt := datetime.DateTime{Time: tm}
 
 	newDate := dt.AddDate(1, -2, 7)
 	assert.Equal(t, 2018, newDate.Year())
@@ -66,7 +66,7 @@ func TestUnmarshalJSON(t *testing.T) {
 	t.Run("raw function", func(t *testing.T) {
 		t.Parallel()
 
-		dt := &datetime.DateTime{}
+		dt := datetime.DateTime{}
 		err := dt.UnmarshalJSON([]byte(`"2017-09-07T23:18:42-0700"`))
 		assert.NoError(t, err, "UnmarshalJSON() should have work")
 
@@ -102,15 +102,23 @@ func TestUnmarshalJSON(t *testing.T) {
 	t.Run("raw function with bad data", func(t *testing.T) {
 		t.Parallel()
 
-		dt := &datetime.DateTime{}
+		dt := datetime.DateTime{}
 		err := dt.UnmarshalJSON([]byte(`"2017-09-07T23:18:42-invalid"`))
 		assert.Error(t, err, "UnmarshalJSON() should have failed")
+	})
+
+	t.Run("null", func(t *testing.T) {
+		dt := datetime.DateTime{}
+		err := dt.UnmarshalJSON([]byte(`null`))
+		assert.NoError(t, err, "UnmarshalJSON() should have work")
+
+		assert.True(t, dt.IsZero())
 	})
 }
 
 func TestMarshalJSON(t *testing.T) {
 	tm := time.Date(2017, time.September, 7, 23, 18, 42, 0, time.UTC)
-	dt := &datetime.DateTime{Time: tm}
+	dt := datetime.DateTime{Time: tm}
 	expectedOutput := `"2017-09-07T23:18:42+0000"`
 
 	t.Run("raw function", func(t *testing.T) {
@@ -121,7 +129,7 @@ func TestMarshalJSON(t *testing.T) {
 
 	t.Run("json.Marshal", func(t *testing.T) {
 		testStruct := struct {
-			Datetime *datetime.DateTime `json:"date"`
+			Datetime datetime.DateTime `json:"date"`
 		}{Datetime: dt}
 		expected := fmt.Sprintf(`{"date":%s}`, expectedOutput)
 
